@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  activemq:
+    image: rmohr/activemq
+    container_name: activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  alert:
+    build: ./alert
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_APPLICATION_NAME: alert
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://host.docker.internal:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+      SPRING_ACTIVEMQ_PACKAGES_TRUST_ALL: "true"
+    depends_on:
+      activemq:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  mail:
+    build: ./mail
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_APPLICATION_NAME: mail
+      SPRING_MAIL_USERNAME: yvishnuvamsith@gmail.com
+      SPRING_MAIL_PASSWORD: irqy dlov bcpn olcz
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://host.docker.internal:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+      SPRING_ACTIVEMQ_PACKAGES_TRUST_ALL: "true"
+    depends_on:
+      activemq:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  safeplaces:
+    build: ./safeplaces
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_NAME: safeplaces
+      SPRING_DATA_MONGODB_URI: mongodb+srv://root:root@it3fsd.6cqlrhg.mongodb.net/SIH?retryWrites=true&w=majority&appName=it3fsd
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://host.docker.internal:61616
+      SPRING_ACTIVEMQ_USER: admin
+      SPRING_ACTIVEMQ_PASSWORD: admin
+      SPRING_ACTIVEMQ_PACKAGES_TRUST_ALL: "true"
+    depends_on:
+      activemq:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  client:
+    build: ./client
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

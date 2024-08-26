@@ -1,0 +1,15 @@
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-jdk-slim
+
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built Spring Boot JAR into the container
+COPY target/alert-0.0.1-SNAPSHOT.jar /app/alert-service.jar
+
+# Expose the port your Alert service runs on
+EXPOSE 8086
+
+# Run the Alert service
+CMD ["java", "-jar", "/app/alert-service.jar"]

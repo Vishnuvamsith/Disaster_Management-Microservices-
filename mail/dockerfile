@@ -1,0 +1,15 @@
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-jdk-slim
+
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built Spring Boot JAR into the container
+COPY target/mail-0.0.1-SNAPSHOT.jar /app/mail-service.jar
+
+# Expose the port your Mail service runs on
+EXPOSE 8085
+
+# Run the Mail service
+CMD ["java", "-jar", "/app/mail-service.jar"]
