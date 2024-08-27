@@ -16,7 +16,7 @@ function QuizSection() {
     navigator.geolocation.getCurrentPosition(async (position) => {
       const { latitude, longitude } = position.coords;
       try {
-        await axios.post('http://localhost:5002/emergency/Location', {
+        await axios.post('http://localhost:8085/email/sendcoord', {
           latitude,
           longitude,
           emergencyType,
